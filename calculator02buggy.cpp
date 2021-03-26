@@ -63,9 +63,10 @@ void Token_stream::putback(Token t)
 
 //------------------------------------------------------------------------------
 
-Token get()
+Token Token_stream::get()
 {
-    if (full) {       // do we already have a Token ready?
+    if(full) 
+    {       // do we already have a Token ready?
         // remove token from buffer
         full = false;
         return buffer;
@@ -112,7 +113,7 @@ double primary()
     {
         double d = expression();
         t = ts.get();
-        if (t.kind != ')') error("')' expected);
+        if (t.kind != ')') error("')' expected");
             return d;
     }
     case '8':            // we use '8' to represent a number
@@ -155,7 +156,7 @@ double term()
 // deal with + and -
 double expression()
 {
-    double left = term(;      // read and evaluate a Term
+    double left = term();      // read and evaluate a Term
     Token t = ts.get();        // get the next token from token stream
 
     while (true) {
@@ -178,29 +179,30 @@ double expression()
 //------------------------------------------------------------------------------
 
 int main()
-try
 {
-    while (cin) {
-        Token t = ts.get();
+    try
+    {
+        while (cin) {
+            Token t = ts.get();
 
-        if (t.kind == 'q') break; // 'q' for quit
-        if (t.kind == ';')        // ';' for "print now"
-            cout << "=" << val << '\n';
-        else
-            ts.putback(t);
-        val = expression();
+            if (t.kind == 'q') break; // 'q' for quit
+            if (t.kind == ';')        // ';' for "print now"
+                cout << "=" << val << '\n';
+            else
+                ts.putback(t);
+            val = expression();
+        }
+        keep_window_open();
     }
-    keep_window_open();
+    catch (exception& e) {
+        cerr << "error: " << e.what() << '\n';
+        keep_window_open();
+        return 1;
+    }
+    catch (...) {
+        cerr << "Oops: unknown exception!\n";
+        keep_window_open();
+        return 2;
+    }
 }
-catch (exception& e) {
-    cerr << "error: " << e.what() << '\n';
-    keep_window_open();
-    return 1;
-}
-catch (...) {
-    cerr << "Oops: unknown exception!\n";
-    keep_window_open();
-    return 2;
-}
-
 //------------------------------------------------------------------------------
