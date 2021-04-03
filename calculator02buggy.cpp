@@ -66,7 +66,7 @@ void Token_stream::putback(Token t)
 Token Token_stream::get()
 {
     if(full) 
-    {       // do we already have a Token ready?
+    {   // do we already have a Token ready?
         // remove token from buffer
         full = false;
         return buffer;
@@ -75,22 +75,24 @@ Token Token_stream::get()
     char ch;
     cin >> ch;    // note that >> skips whitespace (space, newline, tab, etc.)
 
-    switch (ch) {
-    case ';':    // for "print"
-    case 'q':    // for "quit"
-    case '(': case ')': case '+': case '-': case '*': case '/':
-        return Token(ch);        // let each character represent itself
-    case '.':
-    case '0': case '1': case '2': case '3': case '4':
-    case '5': case '6': case '7': case '9':
+    switch (ch) 
     {
-        cin.putback(ch);         // put digit back into the input stream
-        double val;
-        cin >> val;              // read a floating-point number
-        return Token('8', val);   // let '8' represent "a number"
-    }
-    default:
-        error("Bad token");
+        case '=':    // for "print"
+        case 'x':    // for "quit"
+        case '(': case ')': case '+': case '-': case '*': case '/':
+            return Token(ch);        // let each character represent itself
+        case '.':
+        case '0': case '1': case '2': case '3': case '4':
+        case '5': case '6': case '7': case '9':
+        {
+            cin.putback(ch);         // put digit back into the input stream
+            double val;
+            cin >> val;              // read a floating-point number
+            return Token('8', val);   // let '8' represent "a number"
+        }
+        default:
+            error("Bad token");
+            return 1;
     }
 }
 
@@ -108,18 +110,20 @@ double expression();    // declaration so that primary() can call expression()
 double primary()
 {
     Token t = ts.get();
-    switch (t.kind) {
-    case '(':    // handle '(' expression ')'
+    switch (t.kind) 
     {
-        double d = expression();
-        t = ts.get();
-        if (t.kind != ')') error("')' expected");
-            return d;
-    }
-    case '8':            // we use '8' to represent a number
-        return t.value;  // return the number's value
-    default:
-        error("primary expected");
+        case '(':    // handle '(' expression ')'
+        {
+            double d = expression();
+            t = ts.get();
+            if (t.kind != ')') error("')' expected");
+                return d;
+        }
+        case '8':            // we use '8' to represent a number
+            return t.value;  // return the number's value
+        default:
+            error("primary expected");
+            return 1;
     }
 }
 
@@ -180,9 +184,14 @@ double expression()
 
 int main()
 {
+    cout << "Welcome to our simple Calculator.\n";
+    cout << "Please enter expressions using floating point numbers.\n\n";
+
     try
     {
+        double val = 0;
         while (cin) {
+            cout << "> ";
             Token t = ts.get();
 
             if (t.kind == 'q') break; // 'q' for quit
@@ -192,16 +201,17 @@ int main()
                 ts.putback(t);
             val = expression();
         }
-        keep_window_open();
+        //keep_window_open();
+        return 0;
     }
     catch (exception& e) {
         cerr << "error: " << e.what() << '\n';
-        keep_window_open();
+        //keep_window_open();
         return 1;
     }
     catch (...) {
         cerr << "Oops: unknown exception!\n";
-        keep_window_open();
+        //keep_window_open();
         return 2;
     }
 }
